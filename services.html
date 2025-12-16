@@ -1,1 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - DamVan Tech Solutions</title>
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- General Reset & Body --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        body {
+            background-color: #000; /* Solid Black Background */
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            background-color: #000; 
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 1001;
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-logo:visited { color: #fff; }
+        .nav-logo:hover { color: #ccc; }
+
+        .nav-menu-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 1001;
+            width: 30px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-menu-icon:hover { color: #ccc; }
+        .nav-menu-icon i { transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out; }
+        .nav-menu-icon i.icon-hidden { transform: rotate(90deg) scale(0.5); opacity: 0; }
+
+        /* --- Navigation Links --- */
+        .nav-links {
+            position: absolute;
+            right: 80px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            list-style: none;
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        .nav-links.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .nav-links li { margin-left: 30px; }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover { color: #ccc; }
+
+        @media (max-width: 600px) {
+            .nav-links li { margin-left: 15px; }
+            .nav-links a { font-size: 0.8rem; }
+            .navbar { padding: 0 20px; }
+        }
+
+        /* --- Main Content Sections --- */
+        .main-content {
+            padding: 50px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 150px; 
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+
+        /* --- Services Grid Styles --- */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; /* Reduced gap slightly for better border interactions */
+            margin-top: 20px;
+            padding: 2px; /* Prevent glowing overflow clipping */
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 40px 30px;
+            border-radius: 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            position: relative;
+            
+            /* Remove standard border to let the effect shine */
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            
+            /* No movement on hover to avoid "button" feel */
+            cursor: default;
+        }
+
+        /* This pseudo-element creates the border glow.
+           It uses a radial gradient that tracks the mouse position.
+           We use a CSS masking trick to only show the gradient on the border area.
+        */
+        .service-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 8px; 
+            padding: 1.5px; /* Width of the highlighted border */
+            
+            /* The Gradient: centered at mouse-x, mouse-y */
+            background: radial-gradient(
+                600px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 255, 255, 0.8), 
+                transparent 40%
+            );
+            
+            /* Mask composite to hide the center */
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            
+            pointer-events: none; /* Let clicks pass through */
+            z-index: 2;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s;
+        }
+        
+        /* Show the glow when hovering the grid area */
+        .services-grid:hover .service-card::before {
+            opacity: 1;
+        }
+
+        /* Slight surface highlight on the card content itself */
+        .service-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            z-index: 3;
+        }
+
+        .service-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #eee;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            z-index: 3;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background-color: #111;
+            color: #888;
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">DAMVAN TECH</a>
+        
+        <ul class="nav-links">
+            <li><a href="services.html">Services</a></li>
+            <li><a href="servers.html">Servers</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="nav-menu-icon" id="menuBtn">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        
+        <section class="section">
+            <h1 class="section-title">Our Services</h1>
+            
+            <div class="services-grid" id="servicesGrid">
+                
+                <!-- Service 1 -->
+                <div class="service-card">
+                    <i class="fa-solid fa-headset service-icon"></i>
+                    <h3 class="service-title">Remote Tech Support</h3>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="service-card">
+                    <i class="fa-solid fa-download service-icon"></i>
+                    <h3 class="service-title">Software Installation</h3>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="service-card">
+                    <i class="fa-solid fa-network-wired service-icon"></i>
+                    <h3 class="service-title">Network Setup</h3>
+                </div>
+
+                <!-- Service 4 -->
+                <div class="service-card">
+                    <i class="fa-solid fa-desktop service-icon"></i>
+                    <h3 class="service-title">Custom PC Builds</h3>
+                </div>
+
+                <!-- Service 5 -->
+                <div class="service-card">
+                    <i class="fa-solid fa-database service-icon"></i>
+                    <h3 class="service-title">Backend Development</h3>
+                </div>
+
+                <!-- Service 6 -->
+                <div class="service-card">
+                    <i class="fa-solid fa-code service-icon"></i>
+                    <h3 class="service-title">Web Development</h3>
+                </div>
+
+                <!-- Service 7 -->
+                <div class="service-card">
+                    <i class="fa-solid fa-server service-icon"></i>
+                    <h3 class="service-title">Server Creation</h3>
+                </div>
+
+                <!-- Service 8 -->
+                <div class="service-card">
+                    <i class="fa-solid fa-cloud service-icon"></i>
+                    <h3 class="service-title">Server Hosting</h3>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        Copyright 2026 DamVan Inc.
+    </footer>
+
+    <script>
+        // --- MENU TOGGLE LOGIC ---
+        const menuBtnContainer = document.getElementById('menuBtn');
+        const menuIcon = menuBtnContainer.querySelector('i');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuBtnContainer.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            menuIcon.classList.add('icon-hidden');
+
+            setTimeout(() => {
+                if (navLinks.classList.contains('active')) {
+                    menuIcon.classList.remove('fa-bars');
+                    menuIcon.classList.add('fa-xmark');
+                } else {
+                    menuIcon.classList.remove('fa-xmark');
+                    menuIcon.classList.add('fa-bars');
+                }
+                menuIcon.classList.remove('icon-hidden');
+            }, 200);
+        });
+
+        // --- SCROLL REVEAL ANIMATION ---
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px" 
+        });
+
+        document.querySelectorAll('.section').forEach(section => {
+            revealObserver.observe(section);
+        });
+        
+        // --- WINDOWS 10 STYLE BORDER GLOW ---
+        // This script tracks mouse position relative to EACH card
+        const grid = document.getElementById("servicesGrid");
+        const cards = document.getElementsByClassName("service-card");
+
+        grid.onmousemove = e => {
+            for (const card of cards) {
+                const rect = card.getBoundingClientRect(),
+                      x = e.clientX - rect.left,
+                      y = e.clientY - rect.top;
+
+                // Set CSS Variables for the gradient position
+                card.style.setProperty("--mouse-x", `${x}px`);
+                card.style.setProperty("--mouse-y", `${y}px`);
+            }
+        };
+
+        // Fade in animation
+        document.querySelectorAll('.service-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            // We only delay the initial load animation, not the hover effect
+            card.style.transitionDelay = (index * 0.1) + 's';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
