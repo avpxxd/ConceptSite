@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DamVan Website Concept</title>
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- General Reset & Body --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000; /* Solid Black Background */
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scroll bar */
+        }
+
+        /* --- Gradient Navbar --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 1000; /* Ensures nav stays on top of carousel */
+            
+            /* The Transparent Gradient: Black at top (0.9 opacity) to Transparent at bottom */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 1001; /* Ensure logo is above other elements if needed */
+        }
+
+        .nav-menu-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 1001; /* Keep icon on top */
+            width: 30px; /* Fixed width to prevent shifting */
+            text-align: center;
+            /* Container for the icon needs to be stable */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-menu-icon:hover {
+            color: #ccc;
+        }
+
+        /* Icon Animation Styles */
+        .nav-menu-icon i {
+            transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+        }
+
+        /* Class to hide/rotate icon during swap */
+        .nav-menu-icon i.icon-hidden {
+            transform: rotate(90deg) scale(0.5);
+            opacity: 0;
+        }
+
+        /* --- Navigation Links (New) --- */
+        .nav-links {
+            position: absolute;
+            right: 80px; /* Positioned to the left of the hamburger */
+            top: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            list-style: none;
+            opacity: 0; /* Hidden by default */
+            transform: translateX(20px); /* Start slightly right */
+            pointer-events: none; /* Prevent clicks when hidden */
+            transition: all 0.4s ease;
+        }
+
+        .nav-links.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            color: #ccc;
+        }
+
+        /* Mobile Adjustments for Navbar */
+        @media (max-width: 600px) {
+            .nav-links li {
+                margin-left: 15px;
+            }
+            .nav-links a {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* --- Carousel Section --- */
+        .carousel-section {
+            width: 100%;
+            /* Height is dynamic based on aspect ratio calculation below */
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-start; /* Aligns images to top */
+        }
+
+        .carousel-track-container {
+            width: 100%;
+            /* Dynamic Height Calculation for 16:9 Aspect Ratio:
+               Slide width is 70vw.
+               Height = 70vw * (9 / 16) = 39.375vw
+            */
+            height: 39.375vw; 
+            position: relative;
+            top: 0; 
+        }
+
+        .carousel-track {
+            display: flex;
+            position: absolute;
+            left: 50%; /* Center the track relative to screen */
+            height: 100%;
+            padding: 0;
+            list-style: none;
+        }
+
+        .slide {
+            width: 70vw; /* 16:9 base width */
+            height: 100%; /* Matches container height */
+            flex-shrink: 0;
+            padding: 0 10px;
+            position: absolute; 
+            top: 0;
+            
+            /* Transition for the scaling effect */
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            
+            /* Default state (Side images) */
+            opacity: 0.5; 
+            transform: scale(0.92); 
+            transform-origin: center center;
+            z-index: 1;
+        }
+
+        .slide.current-slide {
+            opacity: 1; 
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image fills the 16:9 box */
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+            -webkit-user-drag: none;
+        }
+
+        /* --- Bottom Gradient (New) --- */
+        .bottom-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%; /* Covers bottom 30% of the carousel */
+            background: linear-gradient(to bottom, transparent 0%, #000 100%);
+            z-index: 50; /* Above images */
+            pointer-events: none; /* Let clicks pass through */
+        }
+
+        /* --- Main Content Sections --- */
+        .main-content {
+            padding: 50px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .section {
+            margin-bottom: 100px;
+            opacity: 0; /* Hidden initially for scroll reveal */
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #ccc;
+            max-width: 800px;
+        }
+
+        /* --- Team Section --- */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .team-card {
+            background: rgba(255, 255, 255, 0.05); /* Greyish box */
+            padding: 20px;
+            border-radius: 8px;
+            transition: transform 0.3s, background 0.3s;
+            display: flex;
+            flex-direction: column;
+            
+            /* Animation for individual cards staggering */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out, background 0.3s;
+        }
+
+        .team-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .team-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .team-image-container {
+            width: 100%;
+            /* 4:5 Aspect Ratio */
+            aspect-ratio: 4 / 5;
+            overflow: hidden;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            background-color: #222;
+        }
+
+        .team-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .team-card:hover .team-image-container img {
+            transform: scale(1.05);
+        }
+
+        .team-name {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .team-role {
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .team-bio {
+            font-size: 0.95rem;
+            color: #bbb;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1; /* Pushes button to bottom */
+        }
+
+        .team-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 4px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            align-self: flex-start;
+        }
+
+        .team-btn:hover {
+            background-color: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        /* --- Navigation Buttons (Arrows) --- */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5); /* Black Transparent */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 50px; /* Small circle */
+            height: 50px; /* Small circle */
+            border-radius: 50%; /* Circle shape */
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 60; /* Above gradient */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .btn-left { left: 5%; }
+        .btn-right { right: 5%; }
+
+        /* Dummy content */
+        .content-spacer {
+            height: 50vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #555;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* Mobile adjustment */
+        @media (max-width: 768px) {
+            .slide {
+                width: 85vw; 
+            }
+            .carousel-track-container {
+                /* Recalculate height for mobile width (85vw * 9/16) */
+                height: 47.81vw; 
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Gradient Navbar -->
+    <nav class="navbar">
+        <div class="nav-logo">DamVan</div>
+        
+        <!-- Navigation Links Container -->
+        <ul class="nav-links">
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Servers</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+
+        <div class="nav-menu-icon" id="menuBtn">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- Carousel Section -->
+    <section class="carousel-section">
+        
+        <button class="carousel-btn btn-left" id="prevBtn">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="carousel-track-container">
+            <ul class="carousel-track" id="track">
+                <!-- Slide 1: Coding -->
+                <li class="slide">
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1920&auto=format&fit=crop" alt="Code Development">
+                </li>
+                <!-- Slide 2: Server Room -->
+                <li class="slide">
+                    <img src="https://images.unsplash.com/photo-1683322499436-f4383dd59f5a?q=80&w=1920&auto=format&fit=crop" alt="Server Infrastructure">
+                </li>
+                <!-- Slide 3: Gaming Setup -->
+                <li class="slide">
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1920&auto=format&fit=crop" alt="Gaming & Esports">
+                </li>
+                <!-- Slide 4: Tech Office -->
+                <li class="slide">
+                    <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1920&auto=format&fit=crop" alt="Modern Tech Office">
+                </li>
+                 <!-- Slide 5: Abstract Tech -->
+                 <li class="slide">
+                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop" alt="Global Network">
+                </li>
+            </ul>
+        </div>
+
+        <button class="carousel-btn btn-right" id="nextBtn">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        
+        <!-- Bottom Gradient Overlay -->
+        <div class="bottom-gradient"></div>
+
+    </section>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        
+        <!-- About Us Section -->
+        <section class="section" id="about">
+            <h2 class="section-title">About Us</h2>
+            <p class="about-text">
+                DamVan is a premier technology collective dedicated to building the digital infrastructure of tomorrow. We specialize in high-performance web design, robust backend development, and low-latency game server hosting.
+                <br><br>
+                From custom APIs that power enterprise applications to dedicated servers for the competitive gaming scene, we engineer solutions that are scalable, secure, and built for speed. Whether you are launching a SaaS platform or hosting a massive multiplayer tournament, DamVan provides the technical backbone you need to succeed.
+            </p>
+        </section>
+
+        <!-- Meet The Team Section -->
+        <section class="section" id="team">
+            <h2 class="section-title">Meet the Team</h2>
+            
+            <div class="team-grid">
+                
+                <!-- Team Member 1 -->
+                <div class="team-card">
+                    <div class="team-image-container">
+                        <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=600&auto=format&fit=crop" alt="Alex Dam">
+                    </div>
+                    <h3 class="team-name">Alex White</h3>
+                    <div class="team-role">Senior Full-Stack Developer</div>
+                    <p class="team-bio">
+                        Alex architects scalable web applications and microservices. With expertise in React, Node.js, and Cloud Infrastructure, he ensures every line of code is optimized for performance.
+                    </p>
+                    <a href="#" class="team-btn">GitHub Profile</a>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="team-card">
+                    <div class="team-image-container">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop" alt="Sarah Van">
+                    </div>
+                    <h3 class="team-name">Sarah Rodgers</h3>
+                    <div class="team-role">Server Architect</div>
+                    <p class="team-bio">
+                        The mind behind our low-latency infrastructure. Sarah specializes in Linux system administration and game server optimization, keeping uptime at 99.9%.
+                    </p>
+                    <a href="#" class="team-btn">Tech Blog</a>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div class="team-card">
+                    <div class="team-image-container">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=600&auto=format&fit=crop" alt="Marcus Lee">
+                    </div>
+                    <h3 class="team-name">Marcus Lee</h3>
+                    <div class="team-role">UI/UX & Frontend Lead</div>
+                    <p class="team-bio">
+                        Marcus bridges the gap between complex backend logic and user experience. He designs intuitive interfaces that make powerful technology accessible and beautiful.
+                    </p>
+                    <a href="#" class="team-btn">Dribbble Portfolio</a>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const track = document.getElementById('track');
+        let originalSlides = Array.from(track.children);
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const carouselSection = document.querySelector('.carousel-section'); // Select section for hover events
+
+        // --- MENU TOGGLE LOGIC ---
+        const menuBtnContainer = document.getElementById('menuBtn');
+        const menuIcon = menuBtnContainer.querySelector('i');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuBtnContainer.addEventListener('click', () => {
+            // 1. Trigger Slide-out menu immediately
+            navLinks.classList.toggle('active');
+            
+            // 2. Animate Icon Swap
+            // Add hidden class (rotates and fades out)
+            menuIcon.classList.add('icon-hidden');
+
+            // Wait 200ms (matches CSS transition)
+            setTimeout(() => {
+                // Swap classes while invisible
+                if (navLinks.classList.contains('active')) {
+                    menuIcon.classList.remove('fa-bars');
+                    menuIcon.classList.add('fa-xmark');
+                } else {
+                    menuIcon.classList.remove('fa-xmark');
+                    menuIcon.classList.add('fa-bars');
+                }
+                
+                // Remove hidden class (rotates back and fades in)
+                menuIcon.classList.remove('icon-hidden');
+            }, 200);
+        });
+
+        // --- INFINITE LOOP SETUP ---
+        // Clone first and last slides to create the infinite illusion
+        const firstClone = originalSlides[0].cloneNode(true);
+        const lastClone = originalSlides[originalSlides.length - 1].cloneNode(true);
+
+        firstClone.id = 'first-clone';
+        lastClone.id = 'last-clone';
+
+        track.append(firstClone);
+        track.prepend(lastClone);
+
+        // Get all slides (including clones)
+        let slides = Array.from(track.children);
+        
+        // Start at index 1 because index 0 is now the clone of the last slide
+        let currentIndex = 1;
+        let isTransitioning = false;
+
+        // Position slides horizontally
+        const setSlidePositions = () => {
+             const slideWidth = slides[0].getBoundingClientRect().width;
+             slides.forEach((slide, index) => {
+                slide.style.left = slideWidth * index + 'px';
+            });
+        };
+
+        // Core Move Function
+        const updateCarousel = (useTransition = true) => {
+            const slideWidth = slides[0].getBoundingClientRect().width;
+            
+            // Calculate center position
+            const amountToMove = -(currentIndex * slideWidth) - (slideWidth / 2);
+            
+            if (useTransition) {
+                track.style.transition = 'transform 0.5s ease-in-out';
+                isTransitioning = true;
+            } else {
+                track.style.transition = 'none';
+                isTransitioning = false;
+            }
+            
+            track.style.transform = 'translateX(' + amountToMove + 'px)';
+
+            // Update Classes
+            slides.forEach(slide => {
+                slide.classList.remove('current-slide');
+                slide.style.opacity = '0.5';
+                slide.style.transform = 'scale(0.92)';
+                slide.style.zIndex = '1';
+            });
+            
+            slides[currentIndex].classList.add('current-slide');
+            slides[currentIndex].style.opacity = '1';
+            slides[currentIndex].style.transform = 'scale(1)';
+            slides[currentIndex].style.zIndex = '10';
+        };
+
+        // --- AUTO SCROLL FUNCTIONALITY ---
+        let autoScrollTimer;
+
+        const startAutoScroll = () => {
+            stopAutoScroll(); // Ensure no duplicates
+            autoScrollTimer = setInterval(() => {
+                if (!isTransitioning) {
+                    if (currentIndex >= slides.length - 1) return;
+                    currentIndex++;
+                    updateCarousel(true);
+                }
+            }, 4000); // 4 seconds
+        };
+
+        const stopAutoScroll = () => {
+            clearInterval(autoScrollTimer);
+        };
+
+        // Pause auto-scroll when hovering over the carousel
+        carouselSection.addEventListener('mouseenter', stopAutoScroll);
+        carouselSection.addEventListener('mouseleave', startAutoScroll);
+
+        // Initial Setup
+        // Use timeout to ensure styles are applied before measuring width
+        setTimeout(() => {
+            setSlidePositions();
+            updateCarousel(false); 
+            startAutoScroll(); // Start the timer
+        }, 50);
+
+        // --- EVENTS ---
+
+        // Next Button
+        nextBtn.addEventListener('click', () => {
+            if (isTransitioning) return;
+            if (currentIndex >= slides.length - 1) return;
+            currentIndex++;
+            updateCarousel(true);
+        });
+
+        // Prev Button
+        prevBtn.addEventListener('click', () => {
+            if (isTransitioning) return;
+            if (currentIndex <= 0) return;
+            currentIndex--;
+            updateCarousel(true);
+        });
+
+        // Transition End Listener (The Magic Loop)
+        track.addEventListener('transitionend', () => {
+            isTransitioning = false;
+            
+            // If we are at the cloned last slide (physically at start), jump to real last slide
+            if (slides[currentIndex].id === 'last-clone') {
+                currentIndex = slides.length - 2;
+                updateCarousel(false); // Snap without animation
+            }
+            
+            // If we are at the cloned first slide (physically at end), jump to real first slide
+            if (slides[currentIndex].id === 'first-clone') {
+                currentIndex = 1;
+                updateCarousel(false); // Snap without animation
+            }
+        });
+
+        // Resize Handling
+        window.addEventListener('resize', () => {
+            setSlidePositions();
+            updateCarousel(false);
+        });
+
+        // --- SCROLL REVEAL ANIMATION ---
+        // This observer watches for elements coming into view
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                } else {
+                    // Remove class so it fades out when leaving the screen
+                    // This allows it to re-animate when you scroll back
+                    entry.target.classList.remove('visible');
+                }
+            });
+        }, {
+            threshold: 0.15, // Trigger when 15% of the element is visible
+            rootMargin: "0px 0px -50px 0px" // Slight offset so it triggers before bottom of screen
+        });
+
+        // Observe Sections
+        document.querySelectorAll('.section').forEach(section => {
+            revealObserver.observe(section);
+        });
+
+        // Observe Team Cards individually for staggered effect
+        document.querySelectorAll('.team-card').forEach((card, index) => {
+            // Add a slight delay based on index for stagger effect
+            card.style.transitionDelay = (index * 100) + 'ms'; 
+            revealObserver.observe(card);
+        });
+
+    </script>
+</body>
+</html>
