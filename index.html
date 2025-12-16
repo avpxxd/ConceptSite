@@ -754,26 +754,33 @@
             updateCarousel(false);
         });
 
-        // --- SCROLL REVEAL ANIMATION ---
-        // This observer watches for elements coming into view
+        // --- SCROLL REVEAL ANIMATION (MODIFIED) ---
+        
+        // 1. Manually trigger About Section on load
+        setTimeout(() => {
+            const aboutSection = document.getElementById('about');
+            if(aboutSection) aboutSection.classList.add('visible');
+        }, 300);
+
+        // 2. Observer for other sections (One-way reveal)
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                } else {
-                    // Remove class so it fades out when leaving the screen
-                    // This allows it to re-animate when you scroll back
-                    entry.target.classList.remove('visible');
+                    // Stop observing so it doesn't fade out again
+                    revealObserver.unobserve(entry.target);
                 }
             });
         }, {
-            threshold: 0.15, // Trigger when 15% of the element is visible
-            rootMargin: "0px 0px -50px 0px" // Slight offset so it triggers before bottom of screen
+            threshold: 0.15, 
+            rootMargin: "0px 0px -50px 0px" 
         });
 
-        // Observe Sections
+        // Observe Sections (Except About which is handled manually)
         document.querySelectorAll('.section').forEach(section => {
-            revealObserver.observe(section);
+            if (section.id !== 'about') {
+                revealObserver.observe(section);
+            }
         });
 
         // Observe Team Cards individually for staggered effect
