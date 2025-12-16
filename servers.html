@@ -1,1 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servers - DamVan Tech Solutions</title>
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- General Reset & Body --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        body {
+            background-color: #000; /* Solid Black Background */
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            background-color: #000; 
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 1001;
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-logo:visited { color: #fff; }
+        .nav-logo:hover { color: #ccc; }
+
+        .nav-menu-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 1001;
+            width: 30px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-menu-icon:hover { color: #ccc; }
+        .nav-menu-icon i { transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out; }
+        .nav-menu-icon i.icon-hidden { transform: rotate(90deg) scale(0.5); opacity: 0; }
+
+        /* --- Navigation Links --- */
+        .nav-links {
+            position: absolute;
+            right: 80px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            list-style: none;
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        .nav-links.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .nav-links li { margin-left: 30px; }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover { color: #ccc; }
+
+        @media (max-width: 600px) {
+            .nav-links li { margin-left: 15px; }
+            .nav-links a { font-size: 0.8rem; }
+            .navbar { padding: 0 20px; }
+        }
+
+        /* --- Main Content Sections --- */
+        .main-content {
+            padding: 50px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 150px; 
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .section {
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 800px;
+            margin-bottom: 50px;
+            line-height: 1.6;
+        }
+
+        /* --- Server Grid Styles --- */
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            padding: 2px;
+        }
+
+        .server-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 40px 30px;
+            border-radius: 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            cursor: default;
+        }
+
+        /* Glow Effect (Same as Services) */
+        .server-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 8px; 
+            padding: 1.5px;
+            background: radial-gradient(
+                600px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 255, 255, 0.8), 
+                transparent 40%
+            );
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .server-grid:hover .server-card::before {
+            opacity: 1;
+        }
+
+        .server-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .server-icon {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            z-index: 3;
+        }
+
+        .server-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #eee;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            z-index: 3;
+            margin-bottom: 10px;
+        }
+        
+        .server-desc {
+            font-size: 0.9rem;
+            color: #888;
+            line-height: 1.5;
+            z-index: 3;
+        }
+
+        /* --- Hosting Features List --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon-small {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            margin-top: 4px;
+        }
+        
+        .feature-text h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        
+        .feature-text p {
+            color: #888;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background-color: #111;
+            color: #888;
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">DAMVAN TECH</a>
+        
+        <ul class="nav-links">
+            <li><a href="services.html">Services</a></li>
+            <li><a href="servers.html">Servers</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="nav-menu-icon" id="menuBtn">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        
+        <!-- Game Servers Section -->
+        <section class="section">
+            <h1 class="section-title">Game Server Hosting</h1>
+            <p class="section-subtitle">
+                We specialize in creating and hosting high-performance game servers. Whether you need a private world for friends or a massive community hub with custom modpacks, we handle the creation, configuration, and maintenance.
+            </p>
+            
+            <div class="server-grid" id="serverGrid">
+                
+                <!-- Minecraft -->
+                <div class="server-card">
+                    <i class="fa-solid fa-cube server-icon"></i>
+                    <h3 class="server-title">Minecraft</h3>
+                    <p class="server-desc">Java & Bedrock Editions. Custom Modpacks, Spigot, Paper, and Vanilla setup.</p>
+                </div>
+
+                <!-- FiveM -->
+                <div class="server-card">
+                    <i class="fa-solid fa-car server-icon"></i>
+                    <h3 class="server-title">FiveM</h3>
+                    <p class="server-desc">High-performance GTA V RP servers. Custom scripts, assets, and database optimization.</p>
+                </div>
+
+                <!-- Rust -->
+                <div class="server-card">
+                    <i class="fa-solid fa-radiation server-icon"></i>
+                    <h3 class="server-title">Rust</h3>
+                    <p class="server-desc">Procedural maps, oxide mod support, and DDoS protected hardware for high pop servers.</p>
+                </div>
+
+                <!-- Ark -->
+                <div class="server-card">
+                    <i class="fa-solid fa-dragon server-icon"></i>
+                    <h3 class="server-title">ARK</h3>
+                    <p class="server-desc">Survival Evolved & Ascended. Cluster setups, cross-travel, and mod support.</p>
+                </div>
+
+                <!-- CS2 -->
+                <div class="server-card">
+                    <i class="fa-solid fa-crosshairs server-icon"></i>
+                    <h3 class="server-title">Counter-Strike 2</h3>
+                    <p class="server-desc">128-tick competitive servers, practice modes, and community browser hosting.</p>
+                </div>
+
+                <!-- Valheim -->
+                <div class="server-card">
+                    <i class="fa-solid fa-hammer server-icon"></i>
+                    <h3 class="server-title">Valheim</h3>
+                    <p class="server-desc">Lag-free Viking survival. dedicated resources for large base building and exploration.</p>
+                </div>
+
+                <!-- Palworld -->
+                <div class="server-card">
+                    <i class="fa-solid fa-paw server-icon"></i>
+                    <h3 class="server-title">Palworld</h3>
+                    <p class="server-desc">Optimized dedicated servers for multiplayer stability and high player counts.</p>
+                </div>
+
+                <!-- Terraria -->
+                <div class="server-card">
+                    <i class="fa-solid fa-tree server-icon"></i>
+                    <h3 class="server-title">Terraria</h3>
+                    <p class="server-desc">TModLoader support for modded playthroughs or vanilla large world hosting.</p>
+                </div>
+
+            </div>
+            
+            <!-- Added Text -->
+            <p style="text-align: center; margin-top: 40px; font-size: 1.2rem; color: #aaa; letter-spacing: 2px; text-transform: uppercase; font-weight: 500;">And So Much More</p>
+
+        </section>
+
+        <!-- Features Section -->
+        <section class="section">
+            <h2 class="section-title" style="font-size: 2rem;">Why Host With DamTech?</h2>
+            
+            <div class="features-grid">
+                
+                <div class="feature-item">
+                    <i class="fa-solid fa-microchip feature-icon-small"></i>
+                    <div class="feature-text">
+                        <h4>Creation & Config</h4>
+                        <p>We don't just host; we create. We install mods, configure permissions, and optimize files so you can just play.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <i class="fa-solid fa-shield-halved feature-icon-small"></i>
+                    <div class="feature-text">
+                        <h4>DDoS Protection</h4>
+                        <p>Enterprise-grade mitigation ensures your server stays online even during attacks.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <i class="fa-solid fa-bolt feature-icon-small"></i>
+                    <div class="feature-text">
+                        <h4>Low Latency</h4>
+                        <p>Premium NVMe SSDs and high-speed uplinks provide a lag-free gaming experience.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <i class="fa-solid fa-headset feature-icon-small"></i>
+                    <div class="feature-text">
+                        <h4>24/7 Support</h4>
+                        <p>Direct access to our technicians for troubleshooting, updates, and plugin management.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        Copyright 2026 DamVan Inc.
+    </footer>
+
+    <script>
+        // --- MENU TOGGLE LOGIC ---
+        const menuBtnContainer = document.getElementById('menuBtn');
+        const menuIcon = menuBtnContainer.querySelector('i');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuBtnContainer.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            menuIcon.classList.add('icon-hidden');
+
+            setTimeout(() => {
+                if (navLinks.classList.contains('active')) {
+                    menuIcon.classList.remove('fa-bars');
+                    menuIcon.classList.add('fa-xmark');
+                } else {
+                    menuIcon.classList.remove('fa-xmark');
+                    menuIcon.classList.add('fa-bars');
+                }
+                menuIcon.classList.remove('icon-hidden');
+            }, 200);
+        });
+
+        // --- SCROLL REVEAL ANIMATION ---
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px" 
+        });
+
+        document.querySelectorAll('.section').forEach(section => {
+            revealObserver.observe(section);
+        });
+        
+        // --- WINDOWS 10 STYLE BORDER GLOW ---
+        const grid = document.getElementById("serverGrid");
+        const cards = document.getElementsByClassName("server-card");
+
+        grid.onmousemove = e => {
+            for (const card of cards) {
+                const rect = card.getBoundingClientRect(),
+                      x = e.clientX - rect.left,
+                      y = e.clientY - rect.top;
+
+                card.style.setProperty("--mouse-x", `${x}px`);
+                card.style.setProperty("--mouse-y", `${y}px`);
+            }
+        };
+
+        // Fade in animation
+        document.querySelectorAll('.server-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.transitionDelay = (index * 0.1) + 's';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
